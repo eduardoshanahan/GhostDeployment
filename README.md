@@ -24,14 +24,12 @@ sudo ./install_fabric.sh
 Make sure that all is in the right place:
 ```
 #!bash
-fab vagrant server_update
-fab vagrant update_virtualbox
-fab vagrant fix_vagrant_guest_additions
+fab vagrant server_update update_virtualbox fix_vagrant_guest_additions
 ```
-Now go with Docker:
+Now go with Ghost:
 ```
 #!bash
-fab vagrant ensure_machine
+fab vagrant install_tools
 fab vagrant install_ghost
 fab vagrant server_reboot
 ```

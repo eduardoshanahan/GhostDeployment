@@ -1,59 +1,68 @@
-import json
-import time
-import os
-import socket
-import datetime
-
 from fabric.api import *
+from fabric.operations import reboot
 
 
 env.colorize_errors = True
 
 
 @task
-def hello_world():
+def install_ghost():
     """
-    Run the Ubuntu hello world example
+    Install Ghost blog platform
     """
-    run('docker run ubuntu echo "Hello World"')
+    run('curl -L https://ghost.org/zip/ghost-latest.zip -o ghost.zip')
+    run('unzip -uo ghost.zip -d ghost')
 
 
 @task
-def docker_add_vagrant():
+def install_tools():
     """
-    Add Vagrant to the Docker group to not need sudo all the time
+    Get the tools needed for the OS
     """
-    sudo('gpasswd -a vagrant docker')
-    sudo('service docker restart')
-    local('vagrant reload')
+    install_nodejs()
 
 
 @task
-def ensure_machine():
+def install_unzip():
     """
-    Make sure all is up to date
+    Unzip from package
     """
+    sudo('apt-get install -y unzip')
+
+@task
+def install_curl():
+    """
+    curl from package
+    """
+    sudo('apt-get install -y curl')
+
+
+@task
+def install_nodejs():
+    """
+    NodeJS from external package
+    """
+    run('mkdir -p ~/tmp')
+    sudo('apt-get install -y python-software-properties')
+    sudo('apt-get install -y software-properties-common')
+    sudo('add-apt-repository -y ppa:chris-lea/node.js')
     sudo('apt-get update')
-    sudo('apt-get install -y linux-image-extra-`uname -r`')
+    sudo('apt-get install -y nodejs')
+    run('rm -rf ~/tmp')
 
 
 @task
-def install_docker():
+def server_reboot():
     """
-    Get Docker from the repository
+    Reboot Ubuntu
     """
-    sudo('apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9')
-    sudo('sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"')
-    sudo('apt-get update')
-    sudo('apt-get install -y lxc-docker')
-    sudo('apt-get install -y cgroup-lite')
+    reboot()
 
 
 @task
 def fix_vagrant_guest_additions():
     """
     Version 4.3 of Virtual Box makes Vagrant bomb
-    fab host_vagrant fix_vagrant_guest_additions
     """
     local('vagrant plugin install vagrant-vbguest')
     local('vagrant up --no-provision')
