@@ -12,6 +12,9 @@ def install_ghost():
     """
     run('curl -L https://ghost.org/zip/ghost-latest.zip -o ghost.zip')
     run('unzip -uo ghost.zip -d ghost')
+    run('rm ghost.zip')
+    with cd('ghost'):
+        run('npm install --production')
 
 
 @task
@@ -20,6 +23,8 @@ def install_tools():
     Get the tools needed for the OS
     """
     install_nodejs()
+    install_curl()
+    install_unzip()
 
 
 @task
